@@ -27,7 +27,7 @@ def determinant(matrix: Matrix):
                         [matrix[i+1][0], matrix[i+1][j+1]]
                     ])
                 reduced_matrix[i][j] = determinant(matrix_2x2)
-        det = 1 / (matrix[0][0])**(size_m-2) * determinant(reduced_matrix)
+        det *= 1 / (matrix[0][0])**(size_m-2) * determinant(reduced_matrix)
     return det
 
 
