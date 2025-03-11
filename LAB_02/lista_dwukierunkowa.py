@@ -1,53 +1,58 @@
-class Node:
+class NodeDwukierunkowy:
     def __init__(self, data):
         self.data = data
         self.next = None
+        self.prev = None
 
     def __str__(self):
         return str(self.data)
 
-class ListaWiazana:
+class ListaWiazanaDwukierunkowa:
     def __init__(self):
         self.__head = None
+        self.__tail = None
 
     def destroy(self):
         self.__head = None
 
     def add(self, data) -> None:
-        node = Node(data)
+        node = NodeDwukierunkowy(data)
         if self.__head is None:
             self.__head = node
+            self.__tail = node
         else:
             node.next = self.__head
+            self.__head.prev = node
             self.__head = node
 
     def append(self, data) -> None:
-        node = Node(data)
+        node = NodeDwukierunkowy(data)
         if self.__head is None:
             self.__head = node
+            self.__tail = node
         else:
-            current = self.__head
-            while current.next is not None:
-                current = current.next
-            current.next = node
+            node.prev = self.__tail
+            self.__tail.next = node
+            self.__tail = node
 
     def remove(self):
         if self.__head is None:
             return None
+        if self.length() == 1:
+            self.__head = None
+            self.__tail = None
         self.__head = self.__head.next
+        self.__head.prev = None
 
     def remove_end(self):
         if self.__head is None:
             return None
         elif self.__head.next is None:
             self.__head = None
+            self.__tail = None
         else:
-            current = self.__head
-            previous = None
-            while current.next is not None:
-                previous = current
-                current = current.next
-            previous.next = None
+            self.__tail = self.__tail.prev
+            self.__tail.next = None
 
     def is_empty(self) -> bool:
         if self.__head is None:
@@ -81,6 +86,19 @@ class ListaWiazana:
                 str_list.append(str(current.data))
             return "\n-> ".join(str_list)
 
+    def reversed_print(self):
+        if self.__head is None:
+            print('ListaWiazana is empty')
+        else:
+            str_list = [""]
+            current = self.__tail
+            str_list.append(str(current))
+            while current.prev is not None:
+                current = current.prev
+                str_list.append(str(current.data))
+            print('\n-> '.join(str_list))
+
+
 def main():
     lista_uczelni = [('AGH', 'Kraków', 1919),
                         ('UJ', 'Kraków', 1364),
@@ -89,7 +107,7 @@ def main():
                         ('UP', 'Poznań', 1919),
                         ('PG', 'Gdańsk', 1945)]
 
-    uczelnie = ListaWiazana()
+    uczelnie = ListaWiazanaDwukierunkowa()
     for i in range(3):
         uczelnie.append(lista_uczelni[i])
 
@@ -97,6 +115,7 @@ def main():
         uczelnie.add(lista_uczelni[i+3])
 
     print(uczelnie)
+    uczelnie.reversed_print()
     print(" ")
     print(uczelnie.length())
 
@@ -106,6 +125,7 @@ def main():
 
     uczelnie.remove_end()
     print(uczelnie)
+    uczelnie.reversed_print()
 
     print(" ")
     uczelnie.destroy()
