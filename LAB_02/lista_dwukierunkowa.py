@@ -14,6 +14,7 @@ class ListaWiazanaDwukierunkowa:
 
     def destroy(self):
         self.__head = None
+        self.__tail = None
 
     def add(self, data) -> None:
         node = NodeDwukierunkowy(data)
@@ -55,7 +56,7 @@ class ListaWiazanaDwukierunkowa:
             self.__tail.next = None
 
     def is_empty(self) -> bool:
-        if self.__head is None:
+        if self.__head is None and self.__tail is None:
             return True
         return False
 
