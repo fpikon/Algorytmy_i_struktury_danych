@@ -1,4 +1,4 @@
-class NodeDwukierunkowy:
+class NodeDwuKier:
     def __init__(self, data):
         self.data = data
         self.next = None
@@ -7,7 +7,7 @@ class NodeDwukierunkowy:
     def __str__(self):
         return str(self.data)
 
-class ListaWiazanaDwukierunkowa:
+class ListaDwuKier:
     def __init__(self):
         self.__head = None
         self.__tail = None
@@ -17,8 +17,8 @@ class ListaWiazanaDwukierunkowa:
         self.__tail = None
 
     def add(self, data) -> None:
-        node = NodeDwukierunkowy(data)
-        if self.__head is None:
+        node = NodeDwuKier(data)
+        if self.is_empty():
             self.__head = node
             self.__tail = node
         else:
@@ -27,8 +27,8 @@ class ListaWiazanaDwukierunkowa:
             self.__head = node
 
     def append(self, data) -> None:
-        node = NodeDwukierunkowy(data)
-        if self.__head is None:
+        node = NodeDwuKier(data)
+        if self.is_empty():
             self.__head = node
             self.__tail = node
         else:
@@ -37,18 +37,19 @@ class ListaWiazanaDwukierunkowa:
             self.__tail = node
 
     def remove(self):
-        if self.__head is None:
+        if self.is_empty():
             return None
-        if self.length() == 1:
+        elif self.length() == 1:
             self.__head = None
             self.__tail = None
-        self.__head = self.__head.next
-        self.__head.prev = None
+        else:
+            self.__head = self.__head.next
+            self.__head.prev = None
 
     def remove_end(self):
-        if self.__head is None:
+        if self.is_empty():
             return None
-        elif self.__head.next is None:
+        elif self.length() == 1:
             self.__head = None
             self.__tail = None
         else:
@@ -61,22 +62,22 @@ class ListaWiazanaDwukierunkowa:
         return False
 
     def length(self) -> int:
-        if self.__head is None:
+        if self.is_empty():
             return 0
-        len = 1
+        list_len = 1
         current = self.__head
         while current.next is not None:
-            len += 1
+            list_len += 1
             current = current.next
-        return len
+        return list_len
 
     def get(self):
-        if self.__head is None:
+        if self.is_empty():
             return None
         return self.__head.data
 
     def __str__(self):
-        if self.__head is None:
+        if self.is_empty():
             return 'ListaWiazana is empty'
         else:
             str_list = [""]
@@ -88,7 +89,7 @@ class ListaWiazanaDwukierunkowa:
             return "\n-> ".join(str_list)
 
     def reversed_print(self):
-        if self.__head is None:
+        if self.is_empty():
             print('ListaWiazana is empty')
         else:
             str_list = [""]
@@ -108,7 +109,7 @@ def main():
                         ('UP', 'Poznań', 1919),
                         ('PG', 'Gdańsk', 1945)]
 
-    uczelnie = ListaWiazanaDwukierunkowa()
+    uczelnie = ListaDwuKier()
     for i in range(3):
         uczelnie.append(lista_uczelni[i])
 

@@ -15,7 +15,7 @@ class ListaWiazana:
 
     def add(self, data) -> None:
         node = Node(data)
-        if self.__head is None:
+        if self.is_empty():
             self.__head = node
         else:
             node.next = self.__head
@@ -23,7 +23,7 @@ class ListaWiazana:
 
     def append(self, data) -> None:
         node = Node(data)
-        if self.__head is None:
+        if self.is_empty():
             self.__head = node
         else:
             current = self.__head
@@ -32,14 +32,14 @@ class ListaWiazana:
             current.next = node
 
     def remove(self):
-        if self.__head is None:
+        if self.is_empty():
             return None
         self.__head = self.__head.next
 
     def remove_end(self):
-        if self.__head is None:
+        if self.is_empty():
             return None
-        elif self.__head.next is None:
+        elif self.length() == 1:
             self.__head = None
         else:
             current = self.__head
@@ -55,7 +55,7 @@ class ListaWiazana:
         return False
 
     def length(self) -> int:
-        if self.__head is None:
+        if self.is_empty():
             return 0
         len = 1
         current = self.__head
@@ -65,7 +65,7 @@ class ListaWiazana:
         return len
 
     def get(self):
-        if self.__head is None:
+        if self.is_empty():
             return None
         return self.__head.data
 
