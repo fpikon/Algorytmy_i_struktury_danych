@@ -5,6 +5,22 @@ class Node:
         self.count = 0
         self.next = None
 
+    def insert(self, index, value):
+        if index > self.count:
+            self.tab[self.count] = value
+        else:
+            self.tab[index+1:] = self.tab[index:-1]
+            self.tab[index] = value
+        self.count += 1
+
+    def delete(self, index):
+        if index >= self.count:
+            raise IndexError
+        temp = self.tab[index + 1:]
+        temp.append(None)
+        self.tab[index:] = temp
+        self.count -= 1
+
     def __str__(self):
         return str(self.tab)
         # return str(self.tab[:self.count])
@@ -18,7 +34,7 @@ class ULL:
         current = self.__head
         while index > current.count:
             if current.next is None:
-                raise Exception("Index out of range")
+                raise IndexError
 
             index -= current.count
             current = current.next
@@ -29,49 +45,53 @@ class ULL:
         # przejście do odpowiedniej listy
         while index > current.count:
             if current.next is None:
-
                 break
             index -= current.count
             current = current.next
 
         # powiększenie listy jak jest pełna
         if current.count == self.__size:
-            half_size = self.__size // 2
+            size_half = self.__size // 2
+            size_half_2 = self.__size - size_half
             new_node = Node(self.__size)
             new_node.next = current.next
             current.next = new_node
-            new_node.tab[0:half_size] = current.tab[half_size:]
-            current.tab[half_size:] = [None for _ in range(half_size)]
-            current.count = half_size
-            new_node.count = half_size
+            new_node.tab[0:size_half] = current.tab[size_half_2:]
+            current.tab[size_half_2:] = [None for _ in range(size_half)]
+            current.count = size_half_2
+            new_node.count = size_half
 
             # wybór odpowiedniej listy do dopisania
-            if index >= half_size:
-                index -= half_size
+            if index >= size_half:
+                index -= size_half
                 current = current.next
 
         # dodawanie elementu do listy
-        if index > current.count:
-            current.tab[current.count] = value
-        else:
-            current.tab[index+1:] = current.tab[index:-1]
-            current.tab[index] = value
+        current.insert(index, value)
 
-        current.count += 1
 
     def delete(self, index):
         current = self.__head
+        next_node = current.next
         while index > current.count:
             if current.next is None:
-                raise Exception("Index out of range")
+                raise IndexError
             index -= current.count
             current = current.next
 
-        temp = current.tab[index+1:]
-        temp.append(None)
-        current.tab[index:] = temp
+        current.delete(index)
 
-        current.count -= 1
+        #zmniejszenie ilości tablic w liście
+        if current.count <= self.__size//2:
+            if current.next is not None:
+                for i in range(next_node.count):
+                    data = next_node.tab[0]
+                    next_node.delete(0)
+                    current.insert(current.count, data)
+                    if current.count >= self.__size//2 and not next_node.count <= self.__size//2:
+                        break
+                if next_node.count == 0:
+                    current.next = next_node.next
 
 
 
@@ -92,12 +112,14 @@ def main():
     l = ULL(6)
     for i in range(9):
         l.insert(i+1, i+1)
-        print(l)
     print(l.get(4))
 
     l.insert(1, 10)
-    print(l)
     l.insert(8, 11)
+    print(l)
+
+    l.delete(1)
+    l.delete(2)
     print(l)
 
 
