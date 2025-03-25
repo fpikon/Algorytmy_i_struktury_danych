@@ -93,48 +93,56 @@ class TabMiesz:
                 suma += ord(character)
             return suma % self.size
 
-    def search(self, key):
-        hash_ = self.calc_hash(key)
+    def find_slot(self, key, ignore_removed = False):
+        slot_idx = self.calc_hash(key)
         for i in range(self.size):
-            if self.__tab[hash_] is None:
-                return None
-
-            if self.__tab[hash_].key == key:
-                return self.__tab[hash_].data
-
-            hash_ = (hash_ + self.c1 * i + self.c2 * i **2) % self.size
+            if self.__tab[slot_idx] is None or (ignore_removed and isinstance(self.__tab[slot_idx], Removed)):
+                return slot_idx
+            if not isinstance(self.__tab[slot_idx], Removed):
+                if self.__tab[slot_idx].key == key:
+                    return slot_idx
+            slot_idx = (slot_idx + self.c1 * i + self.c2 * i**2) % self.size
         return None
 
-    def insert(self, key, data):
-        hash_ = self.calc_hash(key)
-        for i in range(self.size):
-            if self.__tab[hash_] is None:
-                self.__tab[hash_] = Data(key, data)
-                return
+    def search(self, key):
+        slot_idx = self.find_slot(key)
+        if slot_idx is None:
+            return None
 
-            if self.__tab[hash_].key == key:
-                self.__tab[hash_] = Data(key, data)
-                return
-            hash_ = (hash_ + self.c1 * i + self.c2 * i **2) % self.size
-        print("Brak miejsca")
+        if self.__tab[slot_idx] is None or isinstance(self.__tab[slot_idx], Removed):
+            return None
+
+        return self.__tab[slot_idx].data
+
+    def insert(self, key, data):
+        slot_idx = self.find_slot(key, ignore_removed = True)
+        if slot_idx is None:
+            raise BrakMiejsca
+        self.__tab[slot_idx] = Data(key, data)
+
 
     def remove(self, key):
-        hash_ = self.calc_hash(key)
-        for i in range(self.size):
-            if self.__tab[hash_] is None:
-                return
+        slot_idx = self.find_slot(key)
+        if slot_idx is None:
+            raise BrakDanej
 
-            if self.__tab[hash_].key == key:
-                self.__tab[hash_] = None
-                return
-            hash_ = (hash_ + self.c1 * i + self.c2 * i **2) % self.size
-        print("Brak danej")
+        self.__tab[slot_idx] = Removed()
 
     def __str__(self):
         str_tab = []
         for i in range(self.size):
             str_tab.append(str(self.__tab[i]))
         return "{" + "\n".join(str_tab) + "}"
+
+class BrakMiejsca(Exception):
+    pass
+
+class BrakDanej(Exception):
+    pass
+
+class Removed:
+    def __str__(self):
+        return "Removed"
 
 def test1(size, c1 = 1, c2 = 0):
     tab = TabMiesz(size, c1, c2)
@@ -143,7 +151,11 @@ def test1(size, c1 = 1, c2 = 0):
     keys[6] = 31
     alfabet = "ABCDEFGHIJKLMNOPRTSU"
     for i in range(15):
-        tab.insert(keys[i], alfabet[i])
+        try:
+            tab.insert(keys[i], alfabet[i])
+        except BrakMiejsca:
+            print("Brak miejsca")
+
     print(tab)
     print(tab.search(5))
     print(tab.search(14))
@@ -152,7 +164,10 @@ def test1(size, c1 = 1, c2 = 0):
     tab.remove(5)
     print(tab)
     print(tab.search(31))
-    tab.insert("test", "W")
+    try:
+        tab.insert("test", "W")
+    except BrakMiejsca:
+        print("Brak miejsca")
 
 def test2(size, c1 = 1, c2 = 0):
     tab = TabMiesz(size, c1, c2)
@@ -160,20 +175,18 @@ def test2(size, c1 = 1, c2 = 0):
     alfabet = "ABCDEFGHIJKLMNOPRTSU"
 
     for i in range(len(keys)):
-        tab.insert(keys[i], alfabet[i])
+        try:
+            tab.insert(keys[i], alfabet[i])
+        except BrakMiejsca:
+            print("Brak miejsca")
     print(tab)
 
 
 def main():
-    print("Test1 1 0")
     test1(13, 1, 0)
-    print("Test2 1 0")
     test2(13, 1, 0)
-    print("Test2 0 1")
     test2(13, 0, 1)
-    print("Test1 0 1")
     test1(13, 0, 1)
-
 
 if __name__ == "__main__":
     main()
