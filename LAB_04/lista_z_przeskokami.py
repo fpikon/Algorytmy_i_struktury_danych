@@ -92,6 +92,7 @@ class SkipList:
     def find_place(self, key):
         if self.is_empty():
             return None
+
         path = []
         node = self.head
         i = -1
@@ -99,26 +100,24 @@ class SkipList:
         while True:
             if -i > node.level:
                 break
-            path.append(node)
-            if node.key is None:
-                node_key = key - 1
-            else:
-                node_key = node.key
 
+            path.append(node)
             next_node = node.tab[i]
+
             if next_node is None:
                 if -i == node.level:
                     break
                 i -= 1
-            elif next_node.key > key > node_key:
-                node = next_node
-                i = -1
-            elif next_node.key > key and node_key > key:
+            elif next_node.key == key:
+                path.append(next_node)
+                return path
+            elif next_node.key > key:
                 i -= 1
-            elif next_node.key <= key:
+            else:
                 node = next_node
                 i = -1
                 path.pop()
+
         return path
 
     def insert(self, key, data):
@@ -143,12 +142,16 @@ class SkipList:
         return None
 
     def delete(self, key):
-        path = self.search(key)
-        last_node = path[-1]
+        path = self.find_place(key)
+        tobedeleted = path[-1]
+        level = tobedeleted.level
         if path is None:
             return
-        for i in range(last_node.level):
-            path[-1-i].tab[i] = last_node.tab[i]
+        for i in range(level):
+            node = self.head.tab[i]
+            while node.tab[i] != tobedeleted:
+                node = node.tab[i]
+            node.tab[i] = tobedeleted.tab[i]
 
     def is_empty(self) -> bool:
         if self.head == Node(None, None, self.max_level):
