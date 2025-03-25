@@ -142,16 +142,14 @@ class SkipList:
         return None
 
     def delete(self, key):
-        path = self.find_place(key)
-        tobedeleted = path[-1]
-        level = tobedeleted.level
-        if path is None:
-            return
-        for i in range(level):
+        for i in range(self.max_level):
             node = self.head.tab[i]
-            while node.tab[i] != tobedeleted:
+            if node is None:
+                return
+            while node.tab[i] is not None and node.tab[i].key != key:
                 node = node.tab[i]
-            node.tab[i] = tobedeleted.tab[i]
+
+            node.tab[i] = node.tab[i].tab[i] if node.tab[i] is not None else None
 
     def is_empty(self) -> bool:
         if self.head == Node(None, None, self.max_level):
@@ -189,25 +187,25 @@ class SkipList:
 
 def main():
     random.seed(42)
-    aaa = SkipList(4)
+    skip_list = SkipList(4)
     alfabet = "ABCDEFGHIJKLMNOPRSTYVWY"
     for i in range(1, 16):
-        aaa.insert(i, alfabet[i-1])
-    aaa.display_list()
+        skip_list.insert(i, alfabet[i-1])
+    skip_list.display_list()
 
-    print(aaa.search(2))
-    aaa.insert(2, "Z")
-    print(aaa.search(2))
+    print(skip_list.search(2))
+    skip_list.insert(2, "Z")
+    print(skip_list.search(2))
 
-    aaa.delete(5)
-    aaa.delete(6)
-    aaa.delete(7)
+    skip_list.delete(5)
+    skip_list.delete(6)
+    skip_list.delete(7)
 
-    print(aaa)
+    print(skip_list)
 
-    aaa.insert(6, "W")
+    skip_list.insert(6, "W")
 
-    print(aaa)
+    print(skip_list)
 
 
 if __name__ == "__main__":
