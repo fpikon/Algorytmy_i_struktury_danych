@@ -143,7 +143,7 @@ class SkipList:
 
     def delete(self, key):
         for i in range(self.max_level):
-            node = self.head.tab[i]
+            node = self.head
             if node is None:
                 return
             while node.tab[i] is not None and node.tab[i].key != key:
@@ -203,6 +203,25 @@ def main():
 
     print(skip_list)
 
+    skip_list.insert(6, "W")
+
+    print(skip_list)
+
+    skip_list = SkipList(4)
+    alfabet = "ABCDEFGHIJKLMNOPRSTYVWY"
+    for i in range(15, 0, -1):
+        skip_list.insert(i, alfabet[i-1])
+    skip_list.display_list()
+
+    print(skip_list.search(2))
+    skip_list.insert(2, "Z")
+    print(skip_list.search(2))
+
+    skip_list.delete(5)
+    skip_list.delete(6)
+    skip_list.delete(7)
+
+    print(skip_list)
     skip_list.insert(6, "W")
 
     print(skip_list)
