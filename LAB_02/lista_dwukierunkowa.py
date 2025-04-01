@@ -1,3 +1,8 @@
+# OCENA 4.5/5
+"""
+elif self.length() == 1: --- przejście po całej liście, a wystarczyło sprawdzić jeden warunek (self.head.next == None)
+self.__head = None
+"""
 class NodeDwuKier:
     def __init__(self, data):
         self.data = data

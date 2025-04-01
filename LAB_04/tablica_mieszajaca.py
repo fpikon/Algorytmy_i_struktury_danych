@@ -1,5 +1,14 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
+# OCENA 3.5/5
+
+"""
+slot_idx = (slot_idx + self.c1 * i + self.c2 * i**2) % self.size
+w wyrażeniu jest calc_hash a nie slot_idx
+
+Wypisywanie niezgodne z instrukcją
+
+Brak wstawiania (mimo istniejącego miejsca)
+tab.insert("test", "W")
+"""
 
 """
 Zaimplementuj tablicę mieszającą w postaci klasy zawierającej 'tablicę statyczną', np.:

@@ -1,3 +1,6 @@
+# OCENA 1.5/2
+# odjął 0.5 punktu bo zły main był a tak to było git
+
 class Node:
     def __init__(self, size):
         self.tab = [None for _ in range(size)]

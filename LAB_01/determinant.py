@@ -1,5 +1,6 @@
 from matrix import *
 
+# Ocena 2/2
 
 def determinant(matrix: Matrix):
     det = 1

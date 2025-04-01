@@ -1,3 +1,5 @@
+# OCENA 5/5
+
 class Queue:
     def __init__(self, size) -> None:
         self.__tab = [None for _ in range(size)]

@@ -1,3 +1,5 @@
+# OCENA 5/5
+
 class Matrix:
     def __init__(self, matrix, value=0):
         if isinstance(matrix, tuple):

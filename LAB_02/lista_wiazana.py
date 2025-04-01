@@ -1,3 +1,12 @@
+# OCENA 1.5/2
+
+"""
+def destroy(self):
+    self.__head = None
+    self.__tail = None
+--- wyciek pamięci, obiekty na które coś wskazuje nie są automatycznie usuwane, a tu elementy wskazują na siebie nawzajem
+"""
+
 class Node:
     def __init__(self, data):
         self.data = data
