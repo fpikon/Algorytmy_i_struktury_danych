@@ -57,7 +57,7 @@ class Node:
         return f"{self.key} {self.data}"
 
 
-class BinaryTree:
+class BinarySearchTree:
     def __init__(self):
         self.root = None
 
@@ -91,27 +91,9 @@ class BinaryTree:
         if node.key == key:
             node.data = data
         elif node.key > key:
-            node.left = self.__insert_it(node.left, key, data)
+            node.left = Node(key, data)
         else:
-            node.right = self.__insert_it(node.right, key, data)
-
-        # self.__insert_it(self.root, key, data)
-
-    def __insert_it(self, node, key, data):
-        if self.root is None:
-            self.root = Node(key, data)
-            return None
-        if node is None:
-            return Node(key, data)
-        if node.key == key:
-            node.data = data
-            return node
-        elif node.key > key:
-            node.left = self.__insert_it(node.left, key, data)
-            return node
-        else:
-            node.right = self.__insert_it(node.right, key, data)
-            return node
+            node.right = Node(key, data)
 
     def delete(self, key):
         node, path = self.__find_node(key, self.root)
@@ -122,6 +104,9 @@ class BinaryTree:
 
         # 0 dzieci
         if node.left is None and node.right is None:
+            if not path:
+                self.root = None
+                return
             parent = path.pop()
             if node.key > parent.key:
                 parent.right = None
@@ -130,22 +115,16 @@ class BinaryTree:
             return
 
         # 1 dziecko
-        # dziecko po prawej
-        if node.left is None:
+        if node.left is None or node.right is None:
+            child = node.left if node.left else node.right
+            if not path:
+                self.root = child
+                return
             parent = path.pop()
-            if node.key < parent.key:
-                parent.left = node.right
+            if parent.left == node:
+                parent.left = child
             else:
-                parent.right = node.right
-            return
-
-        # dziecko po lewej
-        if node.right is None:
-            parent = path.pop()
-            if node.key < parent.key:
-                parent.left = node.left
-            else:
-                parent.right = node.left
+                parent.right = child
             return
 
         # 2 dzieci
@@ -170,6 +149,8 @@ class BinaryTree:
         return successor_node, node
 
     def height(self):
+        if self.root is None:
+            return -1
         return self.__height_it(self.root)
 
     def __height_it(self, node):
@@ -243,7 +224,7 @@ W main-ie sprawdź działanie zaimplementowanego drzewa przez:
 
 
 def main():
-    tree = BinaryTree()
+    tree = BinarySearchTree()
     data_dic = {50:'A', 15:'B', 62:'C', 5:'D', 20:'E', 58:'F', 91:'G', 3:'H', 8:'I', 37:'J', 60:'K', 24:'L'}
 
     for key, data in data_dic.items():
