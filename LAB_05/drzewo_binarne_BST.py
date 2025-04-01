@@ -61,92 +61,65 @@ class BinarySearchTree:
     def __init__(self):
         self.root = None
 
-    def __find_node(self, key, node, path = None):
-        if path is None:
-            path = []
-
-        if node is None:
-            return None, path
-        if node.key == key:
-            return node, path
-        elif node.key < key:
-            path.append(node)
-            return self.__find_node(key, node.right, path)
-        else:
-            path.append(node)
-            return self.__find_node(key, node.left, path)
-
     def search(self, key):
-        node, path = self.__find_node(key, self.root)
+        node = self.__search_it(self.root, key)
         return node.data if node else None
 
-    def insert(self, key, data):
-        if self.root is None:
-            self.root = Node(key, data)
-            return
-        node, path = self.__find_node(key, self.root)
+    def __search_it(self, node, key):
         if node is None:
-            node = path.pop()
+            return None
+        if node.key == key:
+            return node
+        elif node.key < key:
+            return self.__search_it(node.right, key)
+        else:
+            return self.__search_it(node.left, key)
+
+    def insert(self, key, data):
+        self.root = self.__insert_it(self.root ,key, data)
+
+    def __insert_it(self, node, key, data):
+        if node is None:
+            return Node(key, data)
 
         if node.key == key:
             node.data = data
         elif node.key > key:
-            node.left = Node(key, data)
+            node.left = self.__insert_it(node.left, key, data)
         else:
-            node.right = Node(key, data)
+            node.right = self.__insert_it(node.right, key, data)
+
+        return node
 
     def delete(self, key):
-        node, path = self.__find_node(key, self.root)
+        self.root = self.__delete_it(self.root, key)
 
-        # zły klucz
+    def __delete_it(self, node, key):
         if node is None:
-            return
+            return node
 
-        # 0 dzieci
-        if node.left is None and node.right is None:
-            if not path:
-                self.root = None
-                return
-            parent = path.pop()
-            if node.key > parent.key:
-                parent.right = None
-            else:
-                parent.left = None
-            return
+        if key < node.key:
+            node.left = self.__delete_it(node.left, key)
+        elif key > node.key:
+            node.right = self.__delete_it(node.right, key)
+        else:
+            if node.left is None and node.right is None:
+                return None
+            if node.left is None or node.right is None:
+                temp = node.left if node.left else node.right
+                return temp
 
-        # 1 dziecko
-        if node.left is None or node.right is None:
-            child = node.left if node.left else node.right
-            if not path:
-                self.root = child
-                return
-            parent = path.pop()
-            if parent.left == node:
-                parent.left = child
-            else:
-                parent.right = child
-            return
+            successor_node = self.__successor(node.right)
+            node.key = successor_node.key
+            node.data = successor_node.data
+            node.right = self.__delete_it(node.right, successor_node.key)
 
-        # 2 dzieci
-        successor_node, successor_parent = self.__successor(node.key)
-        node.data = successor_node.data
-        node.key = successor_node.key
-        if successor_parent == node:
-            successor_parent.right = successor_node.right
-            return
-        successor_parent.left = successor_node.left
-        return
+        return node
 
-    def __successor(self, key):
-        node, path = self.__find_node(key, self.root)
-        if node is None:
-            return None
-        successor_node = node.right
-        while successor_node.left is not None:
-            node = successor_node
-            successor_node = successor_node.left
-
-        return successor_node, node
+    def __successor(self, node):
+        while node.left is not None:
+            node = node.left
+        return node
 
     def height(self):
         if self.root is None:
@@ -187,6 +160,8 @@ class BinarySearchTree:
         return visit_tab
 
     def __str__(self):
+        if self.root is None:
+            return "Empty tree"
         visit_tab = self.visit_str(self.root)
         return ", ".join(visit_tab)
 
