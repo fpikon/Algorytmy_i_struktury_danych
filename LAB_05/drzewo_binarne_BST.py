@@ -81,7 +81,21 @@ class BinaryTree:
         return node.data if node else None
 
     def insert(self, key, data):
-        self.__insert_it(self.root, key, data)
+        if self.root is None:
+            self.root = Node(key, data)
+            return
+        node, path = self.__find_node(key, self.root)
+        if node is None:
+            node = path.pop()
+
+        if node.key == key:
+            node.data = data
+        elif node.key > key:
+            node.left = self.__insert_it(node.left, key, data)
+        else:
+            node.right = self.__insert_it(node.right, key, data)
+
+        # self.__insert_it(self.root, key, data)
 
     def __insert_it(self, node, key, data):
         if self.root is None:
@@ -139,9 +153,9 @@ class BinaryTree:
         node.data = successor_node.data
         node.key = successor_node.key
         if successor_parent == node:
-            successor_parent.right = None
+            successor_parent.right = successor_node.right
             return
-        successor_parent.left = None
+        successor_parent.left = successor_node.left
         return
 
     def __successor(self, key):
@@ -244,9 +258,6 @@ def main():
     tree.delete(62)
     tree.insert(59, "N")
     tree.insert(100, "P")
-
-    tree.print_tree()
-
     tree.delete(8)
     tree.delete(15)
     tree.insert(55, "R")
