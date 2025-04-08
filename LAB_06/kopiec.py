@@ -64,6 +64,9 @@ W main-ie sprawdź działanie zaimplementowanej kolejki przez:
     opróżnienie kolejki z wypisaniem usuwanych danych (użycie dequeue w pętli dopóki w kolejce będą dane)
     wypisanie opróżnionej kolejki w postaci tablicy (powinno się wypisać { } )
 """
+import random
+
+
 class Node:
     def __init__(self, data, priorytet):
         self.__dane = data
@@ -95,13 +98,13 @@ class Kopiec:
     def enqueue(self, new_node):
         if len(self.tab) > self.heap_size:
             self.tab[self.heap_size] = new_node
-            i = self.heap_size
-            self.heap_size += 1
         else:
             self.tab.append(new_node)
-            i = self.heap_size
-            self.heap_size += 1
 
+        i = self.heap_size
+        self.heap_size += 1
+
+        # warunek kopca
         while self.tab[i] > self.tab[self.parent(i)] and i > 0:
             self.tab[i], self.tab[self.parent(i)] = self.tab[self.parent(i)], self.tab[i]
             i = self.parent(i)
@@ -118,16 +121,31 @@ class Kopiec:
         self.heap_size -= 1
         i = 0
 
+        # warunek kopca
+        while i < self.heap_size:
+            #nie ma potomków
+            if self.left(i) >= self.heap_size and self.right(i) >= self.heap_size:
+                break
 
+            # jeden potomek (jak jest jeden potomek to jest on lewy)
+            if self.left(i) < self.heap_size <= self.right(i):
+                if self.tab[i] < self.tab[self.left(i)]:
+                    self.tab[i], self.tab[self.left(i)] = self.tab[self.left(i)], self.tab[i]
+                    i = self.left(i)
+                    continue
+                else:
+                    break
 
-        while (i < self.heap_size and self.left(i) < self.heap_size and self.right(i) < self.heap_size and
-               (self.tab[i] > self.tab[self.left(i)] or self.tab[i] > self.tab[self.right(i)])):
-            if self.tab[self.left(i)] > self.tab[self.right(i)]:
-                self.tab[i], self.tab[self.left(i)] = self.tab[self.left(i)], self.tab[i]
-                i = self.left(i)
+            # dwoje potomków
+            if self.tab[i] < self.tab[self.right(i)] or self.tab[i] < self.tab[self.left(i)]:
+                if self.tab[self.left(i)] > self.tab[self.right(i)]:
+                    self.tab[i], self.tab[self.left(i)] = self.tab[self.left(i)], self.tab[i]
+                    i = self.left(i)
+                else:
+                    self.tab[i], self.tab[self.right(i)] = self.tab[self.right(i)], self.tab[i]
+                    i = self.right(i)
             else:
-                self.tab[i], self.tab[self.right(i)] = self.tab[self.right(i)], self.tab[i]
-                i = self.right(i)
+                break
         return top
 
     def left(self, idx):
@@ -155,6 +173,7 @@ class Kopiec:
 
 def main():
     kolejka = Kopiec()
+
     keys = [7, 5, 1, 2, 5, 3, 4, 8, 9]
     data = "GRYMOTYLA"
 
@@ -176,8 +195,6 @@ def main():
     while not kolejka.is_empty():
         top = kolejka.dequeue()
         print(top)
-        kolejka.print_tree(0, 0)
-        print(" ")
 
     kolejka.print_tab()
 
