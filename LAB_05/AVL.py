@@ -69,8 +69,6 @@ Dla porównania tak wygląda drzewo niewyważone, czyli drzewo BST:
 
 Efekt końcowy:
 """
-from time import process_time_ns
-
 
 class Node:
     def __init__(self, key, data):

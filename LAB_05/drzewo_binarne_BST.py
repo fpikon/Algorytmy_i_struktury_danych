@@ -1,3 +1,6 @@
+# Ocena 5/5
+
+
 """
 Zaimplementuj w języku Python drzewo binarne BST. Niech będzie zaimplementowane za pomocą dwóch klas: pierwsza klasa
 zawiera pole root wskazujące na korzeń drzewa (ang. root node), druga klasa reprezentuje węzeł drzewa i zawiera cztery
