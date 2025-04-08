@@ -1,3 +1,5 @@
+# Ocena 2/2
+
 """Zaimplementuj listę z przeskokami (skip-list) poprzez stworzenie klasy zawierającej atrybut reprezentujący głowę listy (np. head) oraz metody:
 
     konstruktor z parametrem określającym maksymalną 'wysokość' elementu listy - powinien tworzyć pusty element listy,
