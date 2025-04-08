@@ -64,8 +64,6 @@ W main-ie sprawdź działanie zaimplementowanej kolejki przez:
     opróżnienie kolejki z wypisaniem usuwanych danych (użycie dequeue w pętli dopóki w kolejce będą dane)
     wypisanie opróżnionej kolejki w postaci tablicy (powinno się wypisać { } )
 """
-import random
-
 
 class Node:
     def __init__(self, data, priorytet):
