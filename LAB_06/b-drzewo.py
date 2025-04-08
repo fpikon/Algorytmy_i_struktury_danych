@@ -87,7 +87,7 @@ class Node:
 
         self.keys.insert(i, key)
         if new_child:
-            self.children.insert(i, new_child)
+            self.children.insert(i + 1, new_child)
 
         if len(self.keys) > self.max_children - 1:
             return self.split()
@@ -104,10 +104,9 @@ class Node:
 
         if not self.is_leaf():
             new_node.children = self.children[mid_idx + 1:]
-            self.children = self.children[:mid_idx]
+            self.children = self.children[:mid_idx+1]
 
         return mid_key, new_node
-
 
     def __str__(self):
         return str(self.keys)
@@ -138,8 +137,7 @@ class BTree:
         if result:
             mid_key, new_node = result
             return node.insert(mid_key, new_node)
-        else:
-            return None
+        return None
 
     def print_tree(self):
         print("==============")
@@ -147,40 +145,34 @@ class BTree:
         print("==============")
 
     def _print_tree(self, node, lvl):
-        if node:
-            for i in range(len(node.children) + 1):
-                if i < len(node.children):
+        if node is not None:
+            for i in range(node.size() + 1):
+                if not node.is_leaf() and i < len(node.children):
                     self._print_tree(node.children[i], lvl + 1)
-                if i < len(node.keys):
-                    print("  " * lvl + str(node.keys[i]))
+                if i < node.size():
+                    print(' ' * (lvl * 2), node.keys[i])
+
+
 
 
 def main():
     tree = BTree(4)
     data = [5, 17, 2, 14, 7, 4, 12, 1, 16, 8, 11, 9, 6, 13, 0, 3, 18 , 15, 10, 19]
-
     for i in data:
         tree.insert(i)
-
     tree.print_tree()
 
     tree_2 = BTree(4)
-
     for i in range(20):
         tree_2.insert(i)
-
     tree_2.print_tree()
-
     for i in range(20, 200):
         tree_2.insert(i)
-
     tree_2.print_tree()
 
     tree_3 = BTree(6)
-
     for i in range(200):
         tree_3.insert(i)
-
     tree_3.print_tree()
 
 
