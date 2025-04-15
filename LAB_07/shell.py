@@ -28,28 +28,62 @@ Posortuj ją obiema metodami i porównaj  czas ich wykonania Porównaj także te
 sortowania kopcowego z poprzedniego ćwiczenia.
 UWAGA - dla każdego sortowania potrzebna jest osobna kopia tablicy, gdyż są to sortowania 'in situ'!
 """
+import time
+import random
 
-def selection_sort(tab):
-    for i in range(len(tab)-1):
-        j_min = i
-        for j in range(i+1, len(tab)):
-            if tab[j] < tab[j_min]:
-                j_min = j
-        if j_min != i:
-            tab[i], tab[j_min] = tab[j_min], tab[i]
+
+def insertion_sort(tab):
+    for i in range(1, len(tab)):
+        j = i
+        while j > 0 and tab[j-1] > tab[j]:
+            tab[j], tab[j-1] = tab[j-1], tab[j]
+            j -= 1
+
 
 def shell_sort(tab):
-    h = len(tab)
-    for i in range(len(tab)-1):
-        j_min = i
-        for j in range(i+1, len(tab)):
-            if tab[j] < tab[j_min]:
-                j_min = j
-        if j_min != i:
-            tab[i], tab[j_min] = tab[j_min], tab[i]
+    k = 1
+    h = ((3**k)-1) // 2
+    while ((3 ** k) - 1) // 2 < len(tab) / 3:
+        h = ((3 ** k) - 1) // 2
+        k += 1
+
+    insertion_sort_shell(tab, h)
+
+def insertion_sort_shell(tab, h):
+    if h < 1:
+        return
+    for a in range(h):
+        for i in range(a-1, len(tab), h):
+            j = i
+            while j > 0 and tab[j-h] > tab[j]:
+                tab[j], tab[j - h] = tab[j - 1], tab[j]
+                j -= h
+    insertion_sort_shell(tab, h // 3)
 
 def main():
-    return 0
+    tab = [(5,'A'), (5,'B'), (7,'C'), (2,'D'), (5,'E'), (1,'F'), (7,'G'), (5,'H'), (1,'I'), (2,'J')]
+    shell_sort(tab)
+    print(tab)
+
+    tab = [(5, 'A'), (5, 'B'), (7, 'C'), (2, 'D'), (5, 'E'), (1, 'F'), (7, 'G'), (5, 'H'), (1, 'I'), (2, 'J')]
+    insertion_sort(tab)
+    print(tab)
+
+    tab_size = 10000
+    random_tab = [int(random.random() * 100) for i in range(tab_size)]
+    t_start = time.perf_counter()
+    shell_sort(random_tab)
+    t_stop = time.perf_counter()
+    print("Shell sort:")
+    print("Czas obliczeń:", "{:.7f}".format(t_stop - t_start))
+
+    random_tab = [int(random.random() * 100) for i in range(tab_size)]
+    t_start = time.perf_counter()
+    insertion_sort(random_tab)
+    t_stop = time.perf_counter()
+    print("Insertion sort:")
+    print("Czas obliczeń:", "{:.7f}".format(t_stop - t_start))
+
 
 if __name__ == "__main__":
     main()

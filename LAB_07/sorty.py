@@ -159,28 +159,29 @@ class Kopiec:
     def fix_dequeue(self, idx):
         if idx < 0 or idx >= self.heap_size:
             return
-        if self.left(idx) >= self.heap_size and self.right(idx) >= self.heap_size:
+        child_left = self.left(idx)
+        child_right = self.right(idx)
+
+        # brak potomków
+        if child_left >= self.heap_size and child_right >= self.heap_size:
             return
-        right_idx = self.right(idx)
-        left_idx = self.left(idx)
-        heap = self.heap_size
         # jeden potomek (jak jest jeden potomek to jest on lewy)
-        if self.left(idx) < self.heap_size <= self.right(idx):
-            if self.tab[idx] < self.tab[self.left(idx)]:
-                self.tab[idx], self.tab[self.left(idx)] = self.tab[self.left(idx)], self.tab[idx]
-                self.fix_dequeue(self.left(idx))
+        if child_left < self.heap_size <= child_right:
+            if self.tab[idx] < self.tab[child_left]:
+                self.tab[idx], self.tab[child_left] = self.tab[child_left], self.tab[idx]
+                self.fix_dequeue(child_left)
                 return
             else:
                 return
         # dwoje potomków
-        if self.tab[idx] < self.tab[self.right(idx)] or self.tab[idx] < self.tab[self.left(idx)]:
-            if self.tab[self.left(idx)] > self.tab[self.right(idx)]:
-                self.tab[idx], self.tab[self.left(idx)] = self.tab[self.left(idx)], self.tab[idx]
-                self.fix_dequeue(self.left(idx))
+        if self.tab[idx] < self.tab[child_right] or self.tab[idx] < self.tab[child_left]:
+            if self.tab[child_left] > self.tab[child_right]:
+                self.tab[idx], self.tab[child_left] = self.tab[child_left], self.tab[idx]
+                self.fix_dequeue(child_left)
                 return
             else:
-                self.tab[idx], self.tab[self.right(idx)] = self.tab[self.right(idx)], self.tab[idx]
-                self.fix_dequeue(self.right(idx))
+                self.tab[idx], self.tab[child_right] = self.tab[child_right], self.tab[idx]
+                self.fix_dequeue(child_right)
                 return
         else:
             return
@@ -227,6 +228,26 @@ def selection_sort_shift(tab):
             item = tab.pop(j_min)
             tab.insert(i, item)
 
+def shell_sort(tab):
+    k = 1
+    h = ((3**k)-1) // 2
+    while ((3 ** k) - 1) // 2 < len(tab) / 3:
+        h = ((3 ** k) - 1) // 2
+        k += 1
+
+    insertion_sort_shell(tab, h)
+
+def insertion_sort_shell(tab, h):
+    if h < 1:
+        return
+    for a in range(h):
+        for i in range(a-1, len(tab), h):
+            j = i
+            while j > 0 and tab[j-h] > tab[j]:
+                tab[j], tab[j - h] = tab[j - 1], tab[j]
+                j -= h
+    insertion_sort_shell(tab, h // 3)
+
 def test_1():
     data_tab =  [ Node(key, value) for key,value in  [(5,'A'), (5,'B'), (7,'C'), (2,'D'), (5,'E'), (1,'F'), (7,'G'), (5,'H'), (1,'I'), (2,'J')]]
 
@@ -250,7 +271,9 @@ def test_1():
     print("STABILNE")
 
 def test_2():
-    random_tab = [int(random.random() * 100) for i in range(10000)]
+    tab_size = 10000
+    random_tab = [int(random.random() * 100) for i in range(tab_size)]
+    random_tab_2 = random_tab.copy()
     t_start = time.perf_counter()
     kopiec = Kopiec(random_tab)
     while not kopiec.is_empty():
@@ -259,22 +282,30 @@ def test_2():
     print("Heap sort:")
     print("Czas obliczeń:", "{:.7f}".format(t_stop - t_start))
 
-    random_tab = [int(random.random() * 100) for i in range(10000)]
+
+    t_start = time.perf_counter()
+    shell_sort(random_tab_2)
+    t_stop = time.perf_counter()
+    print("Selection sort swap:")
+    print("Czas obliczeń:", "{:.7f}".format(t_stop - t_start))
+
+    """random_tab = [int(random.random() * 100) for i in range(tab_size)]
     t_start = time.perf_counter()
     selection_sort_swap(random_tab)
     t_stop = time.perf_counter()
     print("Selection sort swap:")
     print("Czas obliczeń:", "{:.7f}".format(t_stop - t_start))
 
-    random_tab = [int(random.random() * 100) for i in range(10000)]
+    random_tab = [int(random.random() * 100) for i in range(tab_size)]
     t_start = time.perf_counter()
     selection_sort_shift(random_tab)
     t_stop = time.perf_counter()
     print("Selection sort shift:")
-    print("Czas obliczeń:", "{:.7f}".format(t_stop - t_start))
+    print("Czas obliczeń:", "{:.7f}".format(t_stop - t_start))"""
 
 def main():
-    aaa = input("Podaj numer testu: ")
+    #aaa = input("Numer testu: ")
+    aaa = ('2')
     if aaa == '1':
         test_1()
     elif aaa == '2':
