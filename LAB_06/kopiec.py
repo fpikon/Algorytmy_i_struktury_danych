@@ -81,8 +81,11 @@ class Node:
 
 
 class Kopiec:
-    def __init__(self):
-        self.tab = []
+    def __init__(self, tab = None):
+        if tab is None:
+            self.tab = []
+        else:
+            self.tab = tab
         self.heap_size = 0
 
     def is_empty(self):
@@ -102,11 +105,17 @@ class Kopiec:
         i = self.heap_size
         self.heap_size += 1
 
-        # warunek kopca
-        while self.tab[i] > self.tab[self.parent(i)] and i > 0:
-            self.tab[i], self.tab[self.parent(i)] = self.tab[self.parent(i)], self.tab[i]
-            i = self.parent(i)
 
+        self.fix_enqueue(i)
+
+    def fix_enqueue(self, idx):
+        if idx <= 0 or idx >= len(self.tab):
+            return
+        if self.tab[idx] > self.tab[self.parent(idx)]:
+            self.tab[idx], self.tab[self.parent(idx)] = self.tab[self.parent(idx)], self.tab[idx]
+            self.fix_enqueue(self.parent(idx))
+        else:
+            return
 
     def dequeue(self):
         if self.is_empty():
@@ -119,32 +128,33 @@ class Kopiec:
         self.heap_size -= 1
         i = 0
 
-        # warunek kopca
-        while i < self.heap_size:
-            #nie ma potomków
-            if self.left(i) >= self.heap_size and self.right(i) >= self.heap_size:
-                break
+        self.fix_dequeue(i)
 
-            # jeden potomek (jak jest jeden potomek to jest on lewy)
-            if self.left(i) < self.heap_size <= self.right(i):
-                if self.tab[i] < self.tab[self.left(i)]:
-                    self.tab[i], self.tab[self.left(i)] = self.tab[self.left(i)], self.tab[i]
-                    i = self.left(i)
-                    continue
-                else:
-                    break
-
-            # dwoje potomków
-            if self.tab[i] < self.tab[self.right(i)] or self.tab[i] < self.tab[self.left(i)]:
-                if self.tab[self.left(i)] > self.tab[self.right(i)]:
-                    self.tab[i], self.tab[self.left(i)] = self.tab[self.left(i)], self.tab[i]
-                    i = self.left(i)
-                else:
-                    self.tab[i], self.tab[self.right(i)] = self.tab[self.right(i)], self.tab[i]
-                    i = self.right(i)
-            else:
-                break
         return top
+
+    def fix_dequeue(self, idx):
+        if idx < 0 or idx >= self.heap_size:
+            return
+        if self.left(idx) >= self.heap_size and self.right(idx) >= self.heap_size:
+            return
+
+        # jeden potomek (jak jest jeden potomek to jest on lewy)
+        if self.left(idx) < self.heap_size <= self.right(idx):
+            if self.tab[idx] < self.tab[self.left(idx)]:
+                self.tab[idx], self.tab[self.left(idx)] = self.tab[self.left(idx)], self.tab[idx]
+                self.fix_dequeue(self.left(idx))
+            else:
+                return
+        # dwoje potomków
+        if self.tab[idx] < self.tab[self.right(idx)] or self.tab[idx] < self.tab[self.left(idx)]:
+            if self.tab[self.left(idx)] > self.tab[self.right(idx)]:
+                self.tab[idx], self.tab[self.left(idx)] = self.tab[self.left(idx)], self.tab[idx]
+                self.fix_dequeue(self.left(idx))
+            else:
+                self.tab[idx], self.tab[self.right(idx)] = self.tab[self.right(idx)], self.tab[idx]
+                self.fix_dequeue(self.right(idx))
+        else:
+            return
 
     def left(self, idx):
         return 2 * idx + 1
@@ -169,6 +179,7 @@ class Kopiec:
     def __str__(self):
         return f'{self.tab}'
 
+
 def main():
     kolejka = Kopiec()
 
@@ -178,7 +189,11 @@ def main():
     for key, d in zip(keys, data):
         new_node = Node(d, key)
         print(new_node)
+        kolejka.print_tab()
         kolejka.enqueue(new_node)
+        kolejka.print_tab()
+        print("\n")
+
 
     kolejka.print_tree(0, 0)
     kolejka.print_tab()
