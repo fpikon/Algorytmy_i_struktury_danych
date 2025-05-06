@@ -14,18 +14,19 @@ class Vertex:
         return str(self.__key)
 
 class GraphMatrix:
-    def __init__(self):
+    def __init__(self, init_val = 0):
         self.__vertices = []
         self.__graph = [[]]
+        self.__init_val = init_val
 
     def is_empty(self):
         return self.__graph == [[]]
 
     def insert_vertex(self, vertex):
         for row in self.__graph:
-            row.append(0)
+            row.append(self.__init_val)
         if self.size() != 0:
-            self.__graph.append([0] * (self.size() + 1))
+            self.__graph.append([self.__init_val] * (self.size() + 1))
         self.__vertices.append(vertex)
 
     def insert_edge(self, vertex1, vertex2, edge = 1):
@@ -80,14 +81,17 @@ class GraphMatrix:
         return str(self.__graph)
 
 class GraphList:
-    def __init__(self):
+    def __init__(self, init_val = 0):
         self.__graph = {}
+        self.__init_val = init_val
 
     def is_empty(self):
         return len(self.__graph) == 0
 
     def insert_vertex(self, vertex):
-        self.__graph[vertex] = {}
+        for key in self.__graph.keys():
+            self.__graph[key][vertex] = self.__init_val
+        self.__graph[vertex] = {key: self.__init_val for key in self.__graph.keys()}
 
     def insert_edge(self, vertex1, vertex2, edge = 1):
         self.__graph[vertex1][vertex2] = edge
@@ -100,13 +104,14 @@ class GraphList:
         self.__graph.pop(vertex)
 
     def delete_edge(self, vertex1, vertex2):
-        self.__graph[vertex1].pop(vertex2)
-        self.__graph[vertex2].pop(vertex1)
+        self.__graph[vertex1][vertex2] = self.__init_val
+        self.__graph[vertex2][vertex1] = self.__init_val
 
     def neighbours(self, vertex_id):
         neigh_list = []
         for neigh in self.__graph[vertex_id].keys():
-            neigh_list.append((neigh, neigh))
+            if self.__graph[vertex_id][neigh] != self.__init_val:
+                neigh_list.append((neigh, neigh))
         return neigh_list
 
     def vertices(self):
@@ -134,7 +139,7 @@ def main():
     polska.draw_map(graph)
 
     # graf na liście
-    graph = GraphList()
+    graph = GraphList(None)
     for vertex in vertices:
         graph.insert_vertex(vertex)
     for edge in edges:
