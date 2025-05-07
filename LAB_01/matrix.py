@@ -18,7 +18,7 @@ class Matrix:
         return len(self.__matrix), len(self.__matrix[0])
 
     def __add__(self, other):
-        if self.size() != other.size():
+        if self.size() != other.order():
             raise Exception("Złe wymiary macierzy")
         else:
             row_s, col_s = self.size()
@@ -30,11 +30,11 @@ class Matrix:
             return new_matrix
 
     def __mul__(self, other):
-        if self.size()[1] != other.size()[0]:
+        if self.size()[1] != other.order()[0]:
             raise Exception("Złe wymiary macierzy")
         else:
             row_s, col_s = self.size()
-            row_o, col_o = other.size()
+            row_o, col_o = other.order()
             new_matrix = Matrix((row_s, col_o))
 
             for i in range(row_s):
@@ -55,10 +55,10 @@ class Matrix:
 
 
 def transpose(matrix):
-    new_matrix = Matrix((matrix.size()[1], matrix.size()[0]))
+    new_matrix = Matrix((matrix.order()[1], matrix.order()[0]))
 
-    for i in range(matrix.size()[0]):
-        for j in range(matrix.size()[1]):
+    for i in range(matrix.order()[0]):
+        for j in range(matrix.order()[1]):
             new_matrix[j][i] = matrix[i][j]
     return new_matrix
 

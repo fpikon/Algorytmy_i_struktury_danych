@@ -127,7 +127,7 @@ class BTree:
 
     def __insert(self, node, key):
         i = 0
-        while i < node.size() and key > node.keys[i]:
+        while i < node.order() and key > node.keys[i]:
             i += 1
 
         if node.is_leaf():
@@ -146,10 +146,10 @@ class BTree:
 
     def _print_tree(self, node, lvl):
         if node is not None:
-            for i in range(node.size() + 1):
+            for i in range(node.order() + 1):
                 if not node.is_leaf() and i < len(node.children):
                     self._print_tree(node.children[i], lvl + 1)
-                if i < node.size():
+                if i < node.order():
                     print(' ' * (lvl * 2), node.keys[i])
 
 

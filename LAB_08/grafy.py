@@ -25,8 +25,8 @@ class GraphMatrix:
     def insert_vertex(self, vertex):
         for row in self.__graph:
             row.append(self.__init_val)
-        if self.size() != 0:
-            self.__graph.append([self.__init_val] * (self.size() + 1))
+        if self.order() != 0:
+            self.__graph.append([self.__init_val] * (self.order() + 1))
         self.__vertices.append(vertex)
 
     def insert_edge(self, vertex1, vertex2, edge = 1):
@@ -65,7 +65,7 @@ class GraphMatrix:
             vertex_list.append(self.get_vertex_id(vertex))
         return vertex_list
 
-    def size(self):
+    def order(self):
         return len(self.__vertices)
 
     def get_vertex_id(self, vertex):
@@ -117,8 +117,14 @@ class GraphList:
     def vertices(self):
         return self.__graph.keys()
 
-    def get_vertex(self, vertex):
+    def get_vertex(self, vertex_idx):
+        return vertex_idx
+
+    def get_vertex_id(self, vertex):
         return vertex
+
+    def order(self):
+        return len(self.__graph)
 
     def __str__(self):
         return str(self.__graph)
