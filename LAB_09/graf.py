@@ -2,6 +2,9 @@ class Vertex:
     def __init__(self, key):
         self.__key = key
 
+    def get_key(self):
+        return self.__key
+
     def __hash__(self):
         return hash(self.__key)
 
@@ -52,6 +55,10 @@ class Graph:
         self.__graph[vertex] = {}
 
     def insert_edge(self, vertex1, vertex2, edge_len = 1.):
+        if vertex1 == vertex2:
+            return
+        self.insert_vertex(vertex1)
+        self.insert_vertex(vertex2)
         self.__graph[vertex1][vertex2] = edge_len
         self.__graph[vertex2][vertex1] = edge_len
 
