@@ -1,8 +1,3 @@
-from copy import deepcopy
-
-from pygments.lexers import graph
-
-
 class Vertex:
     def __init__(self, key):
         self.__key = key
@@ -81,12 +76,14 @@ def mst_prim(graph, v):
     tree_len = 0
     while mst_g.intree[v] == 0:
         mst_g.intree[v] = 1
+        # update listy distance
         for neigh, neigh_dist in graph.neighbours(v):
             if mst_g.intree[neigh] == 0:
                 if neigh_dist < mst_g.distance[neigh]:
                     mst_g.distance[neigh] = neigh_dist
                     mst_g.parent[neigh] = v
 
+        # znajdywanie najbliższego sąsiada
         min_cost = float("inf")
         for vertex in graph.vertices():
             if mst_g.intree[vertex] == 0:
@@ -94,11 +91,13 @@ def mst_prim(graph, v):
                     min_cost = mst_g.distance[vertex]
                     v = vertex
 
+        # dodawanie do grafu
         mst_g.mst_graph.insert_vertex(v)
         mst_g.mst_graph.insert_edge(v, mst_g.parent[v], edge_len = mst_g.distance[v])
         tree_len += mst_g.distance[v]
 
-    return mst_g.mst_graph, tree_len - mst_g.distance[v]
+    tree_len -= mst_g.distance[v] # usunięcie ostatniej wartości edge_len bo jest dodawana 2 razy
+    return mst_g.mst_graph, tree_len
 
 def printGraph(g):
     print("------GRAPH------")
@@ -132,7 +131,6 @@ def main():
     mst, mst_len = mst_prim(my_graph, Vertex('A'))
 
     printGraph(mst)
-    print(mst_len)
 
 if __name__ == '__main__':
     main()
