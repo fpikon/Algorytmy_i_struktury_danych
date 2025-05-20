@@ -1,3 +1,5 @@
+# Ocena 2/2
+
 """
 Zaimplementuj w języku Python drzewo AVL przerabiając program z poprzedniego zadania.
 Klasa reprezentująca węzeł drzewa powinna zawierać dodatkowe pole wykorzystywane do  równoważenia drzewa

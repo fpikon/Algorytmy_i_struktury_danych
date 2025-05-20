@@ -1,3 +1,8 @@
+# Ocena 4/5
+"""data_tab =  [(5,'A'), (5,'B'), (7,'C'), (2,'D'), (5,'E'), (1,'F'), (7,'G'), (5,'H'), (1,'I'), (2,'J')]
+    selection_sort_swap(data_tab)  --- miała być sortowana tablica Node-ów a nie kortek.
+    Dla krotek nie sprawdzi Pan stabilności (sortowane są WSZYSTKIE składowe)"""
+
 """
 Celem ćwiczenia jest implementacja dwóch metod sortowania - przez kopcowanie (ang. heapsort) oraz przez wybieranie (ang. selection sort).
 
