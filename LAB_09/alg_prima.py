@@ -1,3 +1,5 @@
+# Ocena 5/5
+
 class Vertex:
     def __init__(self, key):
         self.__key = key

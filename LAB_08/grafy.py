@@ -1,3 +1,13 @@
+# Ocena 4.5/5
+
+"""
+def insert_vertex(self, vertex):
+        for key in self.__graph.keys():
+            self.__graph[key][vertex] = self.__init_val
+        self.__graph[vertex] = {key: self.__init_val for key in self.__graph.keys()}
+        --- po co wpisywać 'pustych' sąsiadów? wystarcza tu umieścić pusty słownik,po co zajmować miejsce?
+"""
+
 import polska
 
 class Vertex:

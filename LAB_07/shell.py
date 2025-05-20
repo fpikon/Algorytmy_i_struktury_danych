@@ -1,3 +1,5 @@
+# Ocena 2/2
+
 """
 Sortowanie metodą Shella to w pewnym sensie uogólniona metoda sortowania przez wstawianie (ang. insertion sort).
 W wersji "zwykłej" elementy przesuwane są o 1 pozycję aż trafią na odpowiednie miejsce.

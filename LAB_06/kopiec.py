@@ -1,3 +1,5 @@
+# Ocena 5/5
+
 """
 Celem ćwiczenia jest implementacja kolejki priorytetowej jako kopca (maksymalnego) zrealizowanego w postaci tablicy. Jako tablicę można wykorzystać listę pythonową (albo z natywną obsługą, albo realokowaną  'ręcznie' jak w zadaniu z tablicą cykliczną).
 
