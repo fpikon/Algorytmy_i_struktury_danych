@@ -1,11 +1,15 @@
 import os
+from copy import deepcopy
+
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
+from pygments.lexers import graph
 
 
 class Vertex:
     def __init__(self, key):
+        key = (float(key[0]), float(key[1]))
         self.key = key
 
     def get_key(self):
@@ -30,20 +34,22 @@ class Vertex:
         return str(self.key)
 
 class Edge:
-    def __init__(self, v1, v2):
+    def __init__(self, v1, v2, length, angle):
         self.v1 = v1
         self.v2 = v2
+        self.length = length
+        self.angle = angle
 
     def __eq__(self, other):
-        return self.key == other.key
-    def __lt__(self, other):
-        return self.key < other.key
+        if isinstance(other, Edge):
+            return self.length == other.length
+        return False
 
-    def __str__(self):
-        return f"{self.v1} -> {self.v2} : {self.key}"
+    def __lt__(self, other):
+        return self.length < other.length
 
     def __repr__(self):
-        return f"{self.v1} -> {self.v2} : {self.key}"
+        return f"{self.v1} -> {self.v2} : {self.length:.02f} {self.angle:.02f}"
 
 class Graph:
     def __init__(self, init_val = 0):
@@ -63,7 +69,17 @@ class Graph:
             return
         self.insert_vertex(vertex1)
         self.insert_vertex(vertex2)
-        self.__graph[vertex1][vertex2] = 1
+        dist = np.sqrt((vertex1.key[0] - vertex2.key[0])**2 + (vertex1.key[1] - vertex2.key[1])**2)
+        if vertex1.key[0] - vertex2.key[0] == 0:
+            if vertex1.key[1] < vertex2.key[1]:
+                angle = np.pi / 2
+            else:
+                angle = - np.pi / 2
+        else:
+            angle = np.arctan((vertex2.key[1] - vertex1.key[1]) / (vertex2.key[0] - vertex1.key[0]))
+        if angle < 0:
+            angle += 2 * np.pi
+        self.__graph[vertex1][vertex2] = Edge(vertex1, vertex2, dist, angle)
 
     def delete_vertex(self, vertex):
         if vertex not in self.__graph.keys():
@@ -88,11 +104,9 @@ class Graph:
 
     def edges(self):
         edge_list = []
-
         for vertex in self.__graph.keys():
-            for neigh in self.__graph[vertex].keys():
-                edge_list.append(Edge(vertex, neigh, self.__graph[vertex][neigh]))
-
+            for neigh in self.__graph[vertex]:
+                edge_list.append(self.__graph[vertex][neigh])
         return edge_list
 
     def get_vertex(self, vertex_idx):
@@ -100,6 +114,9 @@ class Graph:
 
     def get_vertex_id(self, vertex):
         return vertex
+
+    def get_edge(self, vertex1, vertex2):
+        return self.__graph[vertex1][vertex2]
 
     def order(self):
         return len(self.__graph)
@@ -187,7 +204,7 @@ def merge_near_vertices(graph, thr = 5):
             if flag is True:
                 continue
 
-            distance =  np.sqrt((v_1.key[0] - v_2.key[0])**2 + (v_1.key[1] - v_2.key[1])**2)
+            distance = np.sqrt((v_1.key[0] - v_2.key[0])**2 + (v_1.key[1] - v_2.key[1])**2)
             if distance < thr:
                 cluster.append(v_2)
         cluster_list.append(cluster)
@@ -216,8 +233,60 @@ def merge_near_vertices(graph, thr = 5):
             graph.insert_edge(new_vertex, connection)
             graph.insert_edge(connection, new_vertex)
 
+def translate_and_rotate(graph, vec_dist, angle = 0.):
+    start_graph = deepcopy(graph)
+    tx, ty = vec_dist
+    vertex_dic = {}
+    for vertex in start_graph.vertices():
+        x, y = vertex.key
+        x_prim = (x + tx) * np.cos(angle) + (y + ty) * np.sin(angle)
+        y_prim = -(x + tx) * np.sin(angle) + (y + ty) * np.cos(angle)
+        vertex_dic[vertex] = (x_prim, y_prim)
+
+    for edge in start_graph.edges():
+        v1 = edge.v1
+        v2 = edge.v2
+
+        graph.delete_vertex(v1)
+        graph.delete_vertex(v2)
+
+        new_v1 = Vertex(vertex_dic[v1])
+        new_v2 = Vertex(vertex_dic[v2])
+
+        graph.insert_edge(new_v1, new_v2)
+
+def snap_edge_to_x_axis(graph, edge):
+    if edge.angle > np.pi:
+        angle = np.pi - edge.angle
+    else:
+        angle = -edge.angle
+    translate_and_rotate(graph, [-edge.v1.key[0], -edge.v1.key[1]], angle)
+
+
 def biometric_graph_registration(graph1_input, graph2_input, Ni=50, eps=10):
-    return graph1_input, graph2_input
+    edge_dist_list = []
+    for edge_a in graph1_input.edges():
+        l_a = edge_a.length
+        theta_a = edge_a.angle
+        for edge_b in graph2_input.edges():
+            l_b = edge_b.length
+            theta_b = edge_b.angle
+            s_ab = 1/(0.5*(l_a + l_b)) * np.sqrt((l_a-l_b)**2+(theta_a-theta_b)**2)
+            edge_dist_list.append((edge_a, edge_b, s_ab))
+
+    edge_dist_list.sort(key = lambda x: x[2])
+
+    graph1_output = deepcopy(graph1_input)
+    graph2_output = deepcopy(graph2_input)
+    lowest_dk = float("inf")
+    for edge_a, edge_b, s_ab in edge_dist_list[:Ni]:
+        graph1_temp = deepcopy(graph1_output)
+        graph2_temp = deepcopy(graph2_output)
+
+        snap_edge_to_x_axis(graph1_temp, edge_a)
+        snap_edge_to_x_axis(graph2_temp, edge_a)
+
+        return graph1_temp, graph2_temp
 
 def main():
     data_path = "./Images"
@@ -255,6 +324,26 @@ def main():
             graph2.plot_graph(v_color='gold', e_color='blue')
             plt.title('Graph comparison')
             plt.show()
+
+def test():
+    graph = Graph()
+    v1 = Vertex((1, 1))
+    v2 = Vertex((2, 0))
+
+    graph.insert_edge(v1, v2)
+    graph.plot_graph(v_color='gold', e_color='blue')
+
+    edge = graph.edges()[0]
+    print(edge.angle/(np.pi*2)*360)
+
+    translate_and_rotate(graph, [-edge.v1.key[0], -edge.v1.key[1]])
+    if edge.angle > np.pi:
+        translate_and_rotate(graph, [0, 0], np.pi - edge.angle)
+    else:
+        translate_and_rotate(graph, [0, 0], -edge.angle)
+
+    graph.plot_graph(v_color='red', e_color='green')
+    plt.show()
 
 if __name__ == "__main__":
     main()
