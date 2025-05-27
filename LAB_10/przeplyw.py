@@ -69,11 +69,12 @@ def ford_fulkerson(graph, start_vertex, end_vertex):
         try:
             if not parent[end_vertex]:
                 path_exist = False
+                break
             else:
                 path_exist = True
         except KeyError:
             path_exist = False
-
+            break
         low_cap = find_lowest_capacity(graph, start_vertex, end_vertex, parent)
         augmentation(graph, start_vertex, end_vertex, parent, low_cap)
 
