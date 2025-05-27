@@ -1,6 +1,8 @@
 import os
 import cv2
 import matplotlib.pyplot as plt
+import numpy as np
+
 
 class Vertex:
     def __init__(self, key):
@@ -28,10 +30,9 @@ class Vertex:
         return str(self.key)
 
 class Edge:
-    def __init__(self, v1, v2, key):
+    def __init__(self, v1, v2):
         self.v1 = v1
         self.v2 = v2
-        self.key = key
 
     def __eq__(self, other):
         return self.key == other.key
@@ -57,13 +58,12 @@ class Graph:
             return
         self.__graph[vertex] = {}
 
-    def insert_edge(self, vertex1, vertex2, key = (1., 0.)):
+    def insert_edge(self, vertex1, vertex2):
         if vertex1 == vertex2:
             return
         self.insert_vertex(vertex1)
         self.insert_vertex(vertex2)
-        self.__graph[vertex1][vertex2] = key
-        self.__graph[vertex2][vertex1] = key
+        self.__graph[vertex1][vertex2] = 1
 
     def delete_vertex(self, vertex):
         if vertex not in self.__graph.keys():
@@ -75,7 +75,6 @@ class Graph:
 
     def delete_edge(self, vertex1, vertex2):
         self.__graph[vertex1][vertex2] = self.__init_val
-        self.__graph[vertex2][vertex1] = self.__init_val
 
     def neighbours(self, vertex_id):
         neigh_list = []
@@ -141,7 +140,8 @@ def fill_biometric_graph_from_image(img_bin, graph):
                         graph.insert_edge(n, v)
 
 def unclutter_biometric_graph(graph):
-    to_delete = []
+    v_to_delete = []
+    e_to_add = []
     for vertex in graph.vertices():
         n_list = graph.neighbours(vertex)
         if len(n_list) == 2:
@@ -149,15 +149,75 @@ def unclutter_biometric_graph(graph):
 
         for n, edge in n_list:
             current_v = n
-            while len(graph.neighbours(current_v)) == 2:
-                to_delete.append(current_v)
+            prev_v = current_v
+            current_n_list = graph.neighbours(current_v)
+            while len(current_n_list) == 2:
+                v_to_delete.append(current_v)
+                if current_n_list[0][0] != prev_v:
+                    current_v, prev_v = current_n_list[0][0], current_v
+                else:
+                    current_v, prev_v = current_n_list[1][0], current_v
+                current_n_list = graph.neighbours(current_v)
+            e_to_add.append((vertex, current_v))
+    for v in v_to_delete:
+        graph.delete_vertex(v)
 
+    for v1, v2 in e_to_add:
+        graph.insert_edge(v1, v2)
+        graph.insert_edge(v2, v1)
 
-def merge_near_vertices(graph, thr):
-    return 1
+def merge_near_vertices(graph, thr = 5):
+    cluster_list = []
+    for v_1 in graph.vertices():
+        cluster = []
+        flag = False
+        for cl in cluster_list:
+            if v_1 in cl:
+                flag = True
+        if flag is False:
+            cluster.append(v_1)
+        for v_2 in graph.vertices():
+            if v_1 == v_2:
+                continue
+
+            flag = False
+            for cl in cluster_list:
+                if v_2 in cl:
+                    flag = True
+            if flag is True:
+                continue
+
+            distance =  np.sqrt((v_1.key[0] - v_2.key[0])**2 + (v_1.key[1] - v_2.key[1])**2)
+            if distance < thr:
+                cluster.append(v_2)
+        cluster_list.append(cluster)
+
+    for cluster in cluster_list:
+        if len(cluster) < 2:
+            continue
+        new_v_coord = [0, 0]
+        connections = []
+        for vertex in cluster:
+            new_v_coord[0] += vertex.key[0]
+            new_v_coord[1] += vertex.key[1]
+            for n, _ in graph.neighbours(vertex):
+                if n not in cluster:
+                    connections.append(n)
+
+        new_v_coord[0] = new_v_coord[0]/len(cluster)
+        new_v_coord[1] = new_v_coord[1]/len(cluster)
+        new_vertex = Vertex(tuple(new_v_coord))
+
+        for v_1 in cluster:
+            graph.delete_vertex(v_1)
+
+        graph.insert_vertex(new_vertex)
+        for connection in connections:
+            graph.insert_edge(new_vertex, connection)
+            graph.insert_edge(connection, new_vertex)
 
 def biometric_graph_registration(graph1_input, graph2_input, Ni=50, eps=10):
-    return (1, 1)
+    return graph1_input, graph2_input
 
 def main():
     data_path = "./Images"
@@ -176,10 +236,8 @@ def main():
                
                 graph = Graph()
                 fill_biometric_graph_from_image(img_bin, graph)
-                graph.plot_graph(v_color='red', e_color='green')
-                plt.show()
                 unclutter_biometric_graph(graph)
-                merge_near_vertices(graph, thr=5)
+                merge_near_vertices(graph, thr=10)
 
                 input_data.append((img_name, graph))
                 print("Saved!")
