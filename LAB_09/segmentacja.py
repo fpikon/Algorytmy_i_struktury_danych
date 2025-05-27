@@ -1,3 +1,5 @@
+# Ocena 2/2
+
 from graf import *
 import cv2
 import numpy as np

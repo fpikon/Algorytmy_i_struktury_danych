@@ -1,3 +1,9 @@
+# OCENA 4.5/5
+
+"""
+Miało być True dla resztowej a nie rzeczywistej
+"""
+
 from graf import *
 
 def BFS(graph, start_vertex):

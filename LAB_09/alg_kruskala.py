@@ -1,3 +1,5 @@
+# Ocena 2/2
+
 from graf import *
 
 class UnionFind:
