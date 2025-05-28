@@ -4,7 +4,6 @@ from copy import deepcopy
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
-from pygments.lexers import graph
 
 
 class Vertex:
@@ -185,8 +184,9 @@ def merge_near_vertices(graph, thr = 5):
         for cl in cluster_list:
             if v_1 in cl:
                 flag = True
-        if flag is False:
-            cluster.append(v_1)
+        if flag is True:
+            continue
+        cluster.append(v_1)
         for v_2 in graph.vertices():
             if v_1 == v_2:
                 continue
@@ -321,7 +321,9 @@ def main():
                 graph = Graph()
                 fill_biometric_graph_from_image(img_bin, graph)
                 unclutter_biometric_graph(graph)
-                merge_near_vertices(graph, thr=10)
+
+                for i in range(5):
+                    merge_near_vertices(graph, thr=5)
 
                 input_data.append((img_name, graph))
                 print("Saved!")
