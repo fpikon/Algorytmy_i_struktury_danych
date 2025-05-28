@@ -70,13 +70,7 @@ class Graph:
         self.insert_vertex(vertex1)
         self.insert_vertex(vertex2)
         dist = np.sqrt((vertex1.key[0] - vertex2.key[0])**2 + (vertex1.key[1] - vertex2.key[1])**2)
-        if vertex1.key[0] - vertex2.key[0] == 0:
-            if vertex1.key[1] < vertex2.key[1]:
-                angle = np.pi / 2
-            else:
-                angle = - np.pi / 2
-        else:
-            angle = np.arctan((vertex2.key[1] - vertex1.key[1]) / (vertex2.key[0] - vertex1.key[0]))
+        angle = np.arctan2(vertex2.key[0] - vertex1.key[0], vertex2.key[1] - vertex1.key[1])
         if angle < 0:
             angle += 2 * np.pi
         self.__graph[vertex1][vertex2] = Edge(vertex1, vertex2, dist, angle)
@@ -233,15 +227,15 @@ def merge_near_vertices(graph, thr = 5):
             graph.insert_edge(new_vertex, connection)
             graph.insert_edge(connection, new_vertex)
 
-def translate_and_rotate(graph, vec_dist, angle = 0.):
+def translate_and_rotate(graph, vec_dist, angle):
     start_graph = deepcopy(graph)
-    tx, ty = vec_dist
+    ty, tx = vec_dist
     vertex_dic = {}
     for vertex in start_graph.vertices():
-        x, y = vertex.key
+        y, x = vertex.key
         x_prim = (x + tx) * np.cos(angle) + (y + ty) * np.sin(angle)
         y_prim = -(x + tx) * np.sin(angle) + (y + ty) * np.cos(angle)
-        vertex_dic[vertex] = (x_prim, y_prim)
+        vertex_dic[vertex] = (y_prim, x_prim)
 
     for edge in start_graph.edges():
         v1 = edge.v1
@@ -256,11 +250,9 @@ def translate_and_rotate(graph, vec_dist, angle = 0.):
         graph.insert_edge(new_v1, new_v2)
 
 def snap_edge_to_x_axis(graph, edge):
-    if edge.angle > np.pi:
-        angle = np.pi - edge.angle
-    else:
-        angle = -edge.angle
-    translate_and_rotate(graph, [-edge.v1.key[0], -edge.v1.key[1]], angle)
+    angle = edge.angle
+    vec_dist = [-edge.v1.key[0], -edge.v1.key[1]]
+    translate_and_rotate(graph, vec_dist, angle)
 
 
 def biometric_graph_registration(graph1_input, graph2_input, Ni=50, eps=10):
@@ -280,13 +272,36 @@ def biometric_graph_registration(graph1_input, graph2_input, Ni=50, eps=10):
     graph2_output = deepcopy(graph2_input)
     lowest_dk = float("inf")
     for edge_a, edge_b, s_ab in edge_dist_list[:Ni]:
-        graph1_temp = deepcopy(graph1_output)
-        graph2_temp = deepcopy(graph2_output)
+        graph1_temp = deepcopy(graph1_input)
+        graph2_temp = deepcopy(graph2_input)
 
         snap_edge_to_x_axis(graph1_temp, edge_a)
-        snap_edge_to_x_axis(graph2_temp, edge_a)
+        snap_edge_to_x_axis(graph2_temp, edge_b)
 
-        return graph1_temp, graph2_temp
+        v1_list = list(graph1_temp.vertices())
+        v2_list = list(graph2_temp.vertices())
+
+        c = 0
+        for v1 in v1_list:
+            smallest_dist = float("inf")
+            closest_v2 = None
+            for v2 in v2_list:
+                distance = np.sqrt((v1.key[0] - v2.key[0])**2 + (v1.key[1] - v2.key[1])**2)
+                if distance < smallest_dist:
+                    smallest_dist = distance
+                    closest_v2 = v2
+            if smallest_dist < eps:
+                c += 1
+                v2_list.remove(closest_v2)
+
+        dk = 1 - c / np.sqrt(graph1_temp.order() + graph2_temp.order())
+
+        if dk < lowest_dk:
+            lowest_dk = dk
+            graph1_output = graph1_temp
+            graph2_output = graph2_temp
+
+    return graph1_output, graph2_output
 
 def main():
     data_path = "./Images"
@@ -324,26 +339,6 @@ def main():
             graph2.plot_graph(v_color='gold', e_color='blue')
             plt.title('Graph comparison')
             plt.show()
-
-def test():
-    graph = Graph()
-    v1 = Vertex((1, 1))
-    v2 = Vertex((2, 0))
-
-    graph.insert_edge(v1, v2)
-    graph.plot_graph(v_color='gold', e_color='blue')
-
-    edge = graph.edges()[0]
-    print(edge.angle/(np.pi*2)*360)
-
-    translate_and_rotate(graph, [-edge.v1.key[0], -edge.v1.key[1]])
-    if edge.angle > np.pi:
-        translate_and_rotate(graph, [0, 0], np.pi - edge.angle)
-    else:
-        translate_and_rotate(graph, [0, 0], -edge.angle)
-
-    graph.plot_graph(v_color='red', e_color='green')
-    plt.show()
 
 if __name__ == "__main__":
     main()
