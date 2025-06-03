@@ -1,3 +1,5 @@
+# Ocena 5/5
+
 from copy import deepcopy
 
 class Matrix:

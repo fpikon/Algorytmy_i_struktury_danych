@@ -1,3 +1,5 @@
+# 2/2
+
 """
 Zaimplementuj w języku Python uproszczoną wersję b-drzewa. Należy zaimplementować jedynie funkcję insert dodającą element do drzewa. Ponadto dla uproszczenia założymy, że:
 
