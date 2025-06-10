@@ -294,7 +294,7 @@ def biometric_graph_registration(graph1_input, graph2_input, Ni=50, eps=10):
                 c += 1
                 v2_list.remove(closest_v2)
 
-        dk = 1 - c / np.sqrt(graph1_temp.order() + graph2_temp.order())
+        dk = 1 - c / np.sqrt(graph1_temp.order() * graph2_temp.order())
 
         if dk < lowest_dk:
             lowest_dk = dk
