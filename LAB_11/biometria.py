@@ -321,8 +321,6 @@ def main():
                 graph = Graph()
                 fill_biometric_graph_from_image(img_bin, graph)
                 unclutter_biometric_graph(graph)
-                graph.plot_graph(v_color='red', e_color='green')
-                plt.show()
                 for i in range(5):
                     merge_near_vertices(graph, thr=10)
 
