@@ -1,7 +1,3 @@
-import numpy as np
-from numpy.testing.print_coercion_tables import print_new_cast_table
-
-
 def ASM_rek(P, T, i=None, j=None):
     if i is None:
         i = len(P) - 1
