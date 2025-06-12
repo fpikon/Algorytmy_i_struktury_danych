@@ -1,3 +1,6 @@
+# ocena 3.5 / 4
+# źle mu przekopiowałem kod
+
 import os
 from copy import deepcopy
 

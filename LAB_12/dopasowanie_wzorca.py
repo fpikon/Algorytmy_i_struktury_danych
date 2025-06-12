@@ -1,3 +1,5 @@
+# ocena 5/5
+
 import time
 
 
