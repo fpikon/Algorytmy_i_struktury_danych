@@ -62,7 +62,7 @@ class SuffixTree:
         if node is None:
             node = self.root
         for char, child in sorted(node.children.items()):
-            print("  " * level + f"[{char}] (leaves: {child.leaf_count})")
+            print("    " * level + f"[{char}]")
             self.display(child, prefix + char, level + 1)
 
 
@@ -71,34 +71,33 @@ def build_suffix_array(text):
     suffixes.sort()
     return [index for _, index in suffixes]
 
-def binary_search_suffix_array(text, pattern, suffix_array = None, start = None, end = None, count = None):
+def binary_search_suffix_array(text, pattern, suffix_array = None, count = None):
     if suffix_array is None:
         suffix_array = build_suffix_array(text)
-        print(suffix_array)
-    if start is None:
-        start = 0
-    if end is None:
-        end = len(suffix_array) - 1
+
+    start = 0
+    end = len(suffix_array) - 1
     if count is None:
         count = 0
 
-    if start >= end:
-        return 0
+    if start > end:
+        return count
 
     middle = (start + end) // 2
     suffix_idx = suffix_array[middle]
     suffix = text[suffix_idx:]
-    print(suffix, count)
-    if start + 1 == end:
+    if start == end:
         return count + int(suffix.startswith(pattern))
+
     if suffix.startswith(pattern):
-        count = binary_search_suffix_array(text, pattern, suffix_array, start, middle, count)
-        count = binary_search_suffix_array(text, pattern, suffix_array, middle, end, count)
-        return count + 1
+        count += 1
+        count = binary_search_suffix_array(text, pattern, suffix_array[start:middle], count)
+        count = binary_search_suffix_array(text, pattern, suffix_array[middle + 1:], count)
+        return count
     elif pattern < suffix:
-        count = binary_search_suffix_array(text, pattern, suffix_array, start, middle, count)
+        count = binary_search_suffix_array(text, pattern, suffix_array[start:middle], count)
     else:
-        count = binary_search_suffix_array(text, pattern, suffix_array, middle, start, count)
+        count = binary_search_suffix_array(text, pattern, suffix_array[middle + 1:], count)
     return count
 
 
@@ -106,17 +105,19 @@ def main():
     text = "banana\0"
     suffix_tree = SuffixTree(text)
     suffix_tree.display()
-    suffix_list = ["a", "ban", "ananas", "r", "anan"]
-    for suffix in suffix_list:
-        count = suffix_tree.search(suffix)
-        print(suffix, count)
+    pattern_list = ["a", "ban", "lit", "agh", "anan"]
+    for pattern in pattern_list:
+        count = suffix_tree.search(pattern)
+        print(pattern, count)
 
     print("\n")
     text = "banana\0"
-    suffix_list = ["a", "ban", "ananas", "r", "anan"]
-    for suffix in suffix_list:
-        count = binary_search_suffix_array(text, suffix)
-        print(suffix, count)
+    pattern_list = ["a", "ban", "lit", "agh", "anan"]
+    suffix_array = build_suffix_array(text)
+    print(suffix_array)
+    for pattern in pattern_list:
+        count = binary_search_suffix_array(text, pattern, suffix_array)
+        print(pattern, count)
 
 
 if __name__ == '__main__':
