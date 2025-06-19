@@ -1,5 +1,5 @@
 import numpy as np
-from copy import deepcopy
+from time import perf_counter
 
 class Point:
     def __init__(self, x, y):
@@ -38,9 +38,33 @@ def triangulation_rek(point_list):
 
         if cost < min_cost:
             min_cost = cost
+
     return min_cost
 
+def triangulation_it(point_list):
+    n = len(point_list)
+    if n < 3:
+        return 0
+    if n == 3:
+        return triangle_perimeter(point_list[0], point_list[1], point_list[2])
 
+    table = [[float("inf") for i in range(len(point_list))] for j in range(len(point_list))]
+
+    for i in range(0, n-1):
+        table[i][i+1] = 0
+
+    for m in range(3, n + 1):
+        for i in range(n-m+1):
+            j = i + m - 1
+            table[i][j] = float("inf")
+            for k in range(i + 1, j):
+                cost = triangle_perimeter(point_list[i], point_list[j], point_list[k])
+                cost += table[i][k]
+                cost += table[k][j]
+                if cost < table[i][j]:
+                    table[i][j] = cost
+
+    return table[0][-1], table
 
 def main():
     p_list = [[0, 0], [1, 0], [2, 1], [1, 2], [0, 2]]
@@ -48,16 +72,48 @@ def main():
     point_list = []
     for x, y in p_list:
         point_list.append(Point(x, y))
+    start_time = perf_counter()
     cost = triangulation_rek(point_list)
-    print(cost)
+    end_time = perf_counter()
+    time_taken = end_time - start_time
+    print(f"{cost:.04f}, {time_taken:.07f}")
 
     p_list = [[0, 0], [4, 0], [5, 4], [4, 5], [2, 5], [1, 4], [0, 3], [0, 2]]
 
     point_list = []
     for x, y in p_list:
         point_list.append(Point(x, y))
+
+    start_time = perf_counter()
     cost = triangulation_rek(point_list)
-    print(cost)
+    end_time = perf_counter()
+    time_taken = end_time - start_time
+    print(f"{cost:.04f}, {time_taken:.07f}")
+
+    p_list = [[0, 0], [1, 0], [2, 1], [1, 2], [0, 2]]
+
+    point_list = []
+    for x, y in p_list:
+        point_list.append(Point(x, y))
+
+    start_time = perf_counter()
+    cost, table = triangulation_it(point_list)
+    end_time = perf_counter()
+    time_taken = end_time - start_time
+    print(f"{cost:.04f}, {time_taken:.07f}")
+
+    p_list = [[0, 0], [4, 0], [5, 4], [4, 5], [2, 5], [1, 4], [0, 3], [0, 2]]
+
+    point_list = []
+    for x, y in p_list:
+        point_list.append(Point(x, y))
+
+    start_time = perf_counter()
+    cost, table = triangulation_it(point_list)
+    end_time = perf_counter()
+    time_taken = end_time - start_time
+    print(f"{cost:.04f}, {time_taken:.07f}")
+
 
 if __name__ == '__main__':
     main()
