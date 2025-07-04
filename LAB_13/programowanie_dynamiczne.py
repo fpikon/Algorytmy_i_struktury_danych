@@ -1,3 +1,7 @@
+# Ocena 4.5/5
+
+# brak testu dla "bin"
+
 def ASM_rek(P, T, i=None, j=None):
     if i is None:
         i = len(P) - 1

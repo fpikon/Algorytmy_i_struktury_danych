@@ -1,3 +1,5 @@
+# Ocena 2/2
+
 class SuffixTreeNode:
     def __init__(self):
         self.children = dict()

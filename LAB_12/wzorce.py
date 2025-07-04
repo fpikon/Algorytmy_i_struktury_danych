@@ -1,3 +1,5 @@
+# Ocena 2/2
+
 import time
 
 def hash(word, d = 256, q = 101):

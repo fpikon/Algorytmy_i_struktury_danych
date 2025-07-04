@@ -1,3 +1,5 @@
+# Ocena 2/2
+
 import numpy as np
 from time import perf_counter
 
